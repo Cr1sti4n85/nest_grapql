@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
@@ -35,16 +35,35 @@ export class TodoService {
     return this.todos;
   }
 
-  findOne(id: number): Todo | string {
+  findOne(id: number): Todo {
     const todo = this.todos.find((todo) => todo.id === id);
-    return todo || 'No existe';
+    if (!todo) {
+      throw new NotFoundException('No existe ese id');
+    }
+    return todo;
   }
 
   update(id: number, updateTodoDto: UpdateTodoDto) {
-    return `This action updates a #${id} todo`;
+    const todo = this.findOne(id);
+    const { done, description } = updateTodoDto;
+    if (done !== undefined) {
+      todo.done = done;
+    }
+    if (description) {
+      todo.description = description;
+    }
+
+    this.todos = this.todos.map((dbTodo) => {
+      if (dbTodo.id === id) return todo;
+      return dbTodo;
+    });
+
+    return todo;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} todo`;
+  remove(id: number): string {
+    this.findOne(id);
+    this.todos = this.todos.filter((todo) => todo.id !== id);
+    return 'Lista actualizada';
   }
 }
