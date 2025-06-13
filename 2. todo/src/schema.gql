@@ -2,9 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Todo {
+  id: Int!
+  description: String!
+  done: Boolean!
+}
+
 type Query {
   """Retorna string de hola mundo"""
   salutation: String!
   randomNumber: Float!
   getRandomFromZero(to: Int): Int!
+  todos: [Todo!]!
+  findOne: String!
 }
