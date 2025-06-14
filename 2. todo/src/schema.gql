@@ -14,5 +14,14 @@ type Query {
   randomNumber: Float!
   getRandomFromZero(to: Int): Int!
   todos: [Todo!]!
-  findOne: String!
+  todo(id: Int!): Todo!
+}
+
+type Mutation {
+  createTodos(createTodoInput: CreateTodoInputs!): Todo!
+}
+
+input CreateTodoInputs {
+  """what needs to be done"""
+  description: String!
 }
