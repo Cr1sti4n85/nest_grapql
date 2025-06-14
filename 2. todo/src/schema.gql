@@ -13,7 +13,7 @@ type Query {
   salutation: String!
   randomNumber: Float!
   getRandomFromZero(to: Int): Int!
-  todos: [Todo!]!
+  todos(status: Boolean): [Todo!]!
   todo(id: Int!): Todo!
 }
 
