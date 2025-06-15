@@ -12,6 +12,18 @@ export class TodoService {
     { id: 3, description: 'Piedra del espacio', done: true },
   ];
 
+  get totalTodos(): number {
+    return this.todos.length;
+  }
+
+  get completedTodos(): number {
+    return this.todos.filter((todo) => todo.done).length;
+  }
+
+  get pendingTodos(): number {
+    return this.todos.filter((todo) => !todo.done).length;
+  }
+
   findAll({ status }: StatusArgs): Todo[] {
     if (status !== undefined) {
       const filteredTodo = this.todos.filter((todo) => todo.done === status);
