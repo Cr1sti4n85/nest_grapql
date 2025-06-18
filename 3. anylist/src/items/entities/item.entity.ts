@@ -9,14 +9,14 @@ export class Item {
   id: string;
 
   @Field(() => String)
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Field(() => Float)
   @Column()
   quantity: number;
 
-  @Field(() => String)
-  @Column()
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
   quantityUnits: string;
 }
