@@ -16,12 +16,12 @@ export class ItemsResolver {
   }
 
   @Query(() => [Item], { name: 'items' })
-  findAll() {
+  findAll(): Promise<Item[]> {
     return this.itemsService.findAll();
   }
 
   @Query(() => Item, { name: 'item' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id', { type: () => String }) id: string): Promise<Item> {
     return this.itemsService.findOne(id);
   }
 

@@ -18,12 +18,16 @@ export class ItemsService {
     return newItem;
   }
 
-  findAll() {
-    return `This action returns all items`;
+  async findAll(): Promise<Item[]> {
+    return this.itemsRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} item`;
+  async findOne(id: string): Promise<Item> {
+    const item = await this.itemsRepository.findOneBy({ id });
+    if (!item) {
+      throw new Error(`Item with id ${id} not found`);
+    }
+    return item;
   }
 
   update(id: number, updateItemInput: UpdateItemInput) {
