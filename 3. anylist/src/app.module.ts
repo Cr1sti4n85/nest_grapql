@@ -6,6 +6,7 @@ import { join } from 'path';
 import { ItemsModule } from './items/items.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -36,6 +37,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
 
     ItemsModule,
+
+    UsersModule,
   ],
   controllers: [],
   providers: [],
