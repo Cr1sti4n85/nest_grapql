@@ -19,7 +19,7 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   @Field(() => [String])
   roles: string[];
 

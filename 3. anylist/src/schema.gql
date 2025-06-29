@@ -53,6 +53,6 @@ input UpdateItemInput {
 
 input SignupInput {
   email: String!
-  fullname: String!
+  fullName: String!
   password: String!
 }

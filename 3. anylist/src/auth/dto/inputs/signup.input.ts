@@ -9,7 +9,7 @@ export class SignupInput {
 
   @Field(() => String)
   @IsNotEmpty()
-  fullname: string;
+  fullName: string;
 
   @Field(() => String)
   @IsNotEmpty()
