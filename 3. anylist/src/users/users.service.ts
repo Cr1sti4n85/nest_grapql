@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -8,6 +13,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger('UsersService');
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
@@ -17,8 +23,7 @@ export class UsersService {
       const newUser = this.userRepository.create(signupInput);
       return await this.userRepository.save(newUser);
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Error creating user');
+      this.handleDBExceptions(error);
     }
   }
 
@@ -36,5 +41,12 @@ export class UsersService {
 
   async block(id: string) {
     return {} as User;
+  }
+
+  private handleDBExceptions(error: any): never {
+    if (error.code === '23505') throw new BadRequestException(error.detail);
+
+    this.logger.error(error);
+    throw new InternalServerErrorException('Please check server logs');
   }
 }
