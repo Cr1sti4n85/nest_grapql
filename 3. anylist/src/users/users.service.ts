@@ -4,13 +4,12 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import { SignupInput } from '../auth/dto/inputs/signup.input';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-
+import { hashSync } from 'bcryptjs';
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger('UsersService');
@@ -20,7 +19,10 @@ export class UsersService {
 
   async create(signupInput: SignupInput): Promise<User> {
     try {
-      const newUser = this.userRepository.create(signupInput);
+      const newUser = this.userRepository.create({
+        ...signupInput,
+        password: hashSync(signupInput.password, 10),
+      });
       return await this.userRepository.save(newUser);
     } catch (error) {
       this.handleDBExceptions(error);
@@ -44,7 +46,8 @@ export class UsersService {
   }
 
   private handleDBExceptions(error: any): never {
-    if (error.code === '23505') throw new BadRequestException(error.detail);
+    if (error.code === 'ER_DUP_ENTRY')
+      throw new BadRequestException(error.detail);
 
     this.logger.error(error);
     throw new InternalServerErrorException('Please check server logs');
