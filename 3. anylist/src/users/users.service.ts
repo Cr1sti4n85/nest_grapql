@@ -33,8 +33,15 @@ export class UsersService {
     return [];
   }
 
-  async findOne(id: string): Promise<User> {
-    return {} as User;
+  async findOneByEmail(email: string): Promise<User> {
+    try {
+      return await this.userRepository.findOneByOrFail({ email });
+    } catch (error) {
+      this.handleDBExceptions({
+        code: 'EMAIL_NOT_FOUND',
+        detail: `User with email ${email} not found`,
+      });
+    }
   }
 
   update(id: number, updateUserInput: UpdateUserInput) {
@@ -47,6 +54,9 @@ export class UsersService {
 
   private handleDBExceptions(error: any): never {
     if (error.code === 'ER_DUP_ENTRY')
+      throw new BadRequestException(error.detail);
+
+    if (error.code === 'EMAIL_NOT_FOUND')
       throw new BadRequestException(error.detail);
 
     this.logger.error(error);
