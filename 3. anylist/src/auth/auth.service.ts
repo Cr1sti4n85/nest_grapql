@@ -56,4 +56,20 @@ export class AuthService {
     }
     return user;
   }
+
+  revalidateToken(user: User): AuthResponse {
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    //create jwt
+    const token = this.jwtService.sign({
+      id: user.id,
+    });
+
+    return {
+      token,
+      user,
+    };
+  }
 }
