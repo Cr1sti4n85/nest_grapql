@@ -44,6 +44,17 @@ export class UsersService {
     }
   }
 
+  async findOneById(id: string): Promise<User> {
+    try {
+      return await this.userRepository.findOneByOrFail({ id });
+    } catch (error) {
+      this.handleDBExceptions({
+        code: 'ID_NOT_FOUND',
+        detail: `User with email ${id} not found`,
+      });
+    }
+  }
+
   update(id: number, updateUserInput: UpdateUserInput) {
     return `This action updates a #${id} user`;
   }

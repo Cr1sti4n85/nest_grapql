@@ -1,10 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthResponse } from './types/auth-response.type';
 import { SignupInput } from './dto/inputs/signup.input';
 import { UsersService } from '../users/users.service';
 import { LoginInput } from './dto/inputs/login.input';
 import { compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -14,8 +19,6 @@ export class AuthService {
   ) {}
 
   async signup(signupInput: SignupInput): Promise<AuthResponse> {
-    console.log(signupInput);
-
     //crear user
     const user = await this.usersService.create(signupInput);
 
@@ -43,5 +46,14 @@ export class AuthService {
       token,
       user,
     };
+  }
+
+  async validateUser(id: string): Promise<User> {
+    const user = await this.usersService.findOneById(id);
+
+    if (user.isBlocked) {
+      throw new UnauthorizedException('User is inactive');
+    }
+    return user;
   }
 }
