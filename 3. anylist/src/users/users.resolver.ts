@@ -1,8 +1,6 @@
 import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
 import { ValidRolesArgs } from './args/roles.arg';
 
 @Resolver(() => User)
@@ -12,8 +10,7 @@ export class UsersResolver {
   @Query(() => [User], { name: 'users' })
   //Args ya no necesita nombre entre parentesis porque lo toma de ValidRolesArgs
   findAll(@Args() validRoles: ValidRolesArgs): Promise<User[]> {
-    console.log(validRoles);
-    return this.usersService.findAll();
+    return this.usersService.findAll(validRoles.roles);
   }
 
   // @Query(() => User, { name: 'user' })

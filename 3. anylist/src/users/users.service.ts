@@ -10,6 +10,7 @@ import { SignupInput } from '../auth/dto/inputs/signup.input';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hashSync } from 'bcryptjs';
+import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger('UsersService');
@@ -29,8 +30,18 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<User[]> {
-    return [];
+  async findAll(roles: ValidRoles[]): Promise<User[]> {
+    if (roles.length === 0) return this.userRepository.find();
+
+    const queries = roles
+      .map((role) => `JSON_CONTAINS(user.roles, '"${role}"')`)
+      .join(' OR ');
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .where(queries)
+      .getMany();
+
+    return users;
   }
 
   async findOneByEmail(email: string): Promise<User> {
