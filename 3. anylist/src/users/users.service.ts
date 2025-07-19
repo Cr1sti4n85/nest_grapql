@@ -31,7 +31,16 @@ export class UsersService {
   }
 
   async findAll(roles: ValidRoles[]): Promise<User[]> {
-    if (roles.length === 0) return this.userRepository.find();
+    if (roles.length === 0)
+      return this.userRepository
+        .find
+        //la entity tiene configuration lazy
+        //     {
+        //         relations: {
+        //           lastUpdatedBy: true,
+        //         },
+        //  }
+        ();
 
     const queries = roles
       .map((role) => `JSON_CONTAINS(user.roles, '"${role}"')`)
@@ -70,8 +79,15 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  async block(id: string) {
-    return {} as User;
+  async block(id: string, adminUser: User): Promise<User> {
+    const user = await this.findOneById(id);
+    user.isBlocked = true;
+    user.lastUpdatedBy = adminUser;
+    try {
+      return await this.userRepository.save(user);
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
   private handleDBExceptions(error: any): never {

@@ -18,7 +18,6 @@ export class UsersResolver {
     @Args() validRoles: ValidRolesArgs,
     @CurrentUser([ValidRoles.admin]) user: User,
   ): Promise<User[]> {
-    console.log(user);
     return this.usersService.findAll(validRoles.roles);
   }
 
@@ -30,8 +29,11 @@ export class UsersResolver {
     return this.usersService.findOneById(id);
   }
 
-  @Mutation(() => User)
-  blockUser(@Args('id', { type: () => ID }) id: string): Promise<User> {
-    return this.usersService.block(id);
+  @Mutation(() => User, { name: 'blockUser' })
+  blockUser(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser([ValidRoles.admin]) user: User,
+  ): Promise<User> {
+    return this.usersService.block(id, user);
   }
 }
