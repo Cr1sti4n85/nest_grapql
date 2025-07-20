@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -75,8 +76,30 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  async update(
+    id: string,
+    updateUserInput: UpdateUserInput,
+    updatedBy: User,
+  ): Promise<User> {
+    const { id: userId, ...data } = updateUserInput;
+
+    if (updatedBy.id !== id) {
+      throw new UnauthorizedException(
+        'You are not allowed to update this user.',
+      );
+    }
+
+    const user = await this.userRepository.preload({
+      id,
+      ...data,
+      lastUpdatedBy: updatedBy,
+    });
+
+    if (!user) {
+      throw new BadRequestException(`User with id ${id} not found`);
+    }
+
+    return this.userRepository.save(user);
   }
 
   async block(id: string, adminUser: User): Promise<User> {
