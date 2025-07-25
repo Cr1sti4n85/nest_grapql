@@ -8,18 +8,45 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      playground: false,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      imports: [ConfigModule, AuthModule],
+      inject: [ConfigService, JwtService],
+      useFactory: async (
+        configService: ConfigService,
+        jwtService: JwtService,
+      ) => ({
+        autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+        playground: configService.get('GRAPHQL_PLAYGROUND') === 'true',
+        plugins: [ApolloServerPluginLandingPageLocalDefault()],
+        //este context exige token siempre, si no se tiene un token entonces no se puede acceder a la info en graphql studio. Se puede usar cuando los endpoints de login y register están separados, como por ejemplo en una api rest.
+        // context: ({ req }: { req: Request }) => {
+        //   const token = req.headers.authorization?.replace('Bearer ', '')
+        //     .trim();
+        //   if (!token) {
+        //     throw new Error('No token provided');
+        //   }
+        //   const payload = jwtService.decode(token);
+        //   if (!payload || typeof payload !== 'object') {
+        //     throw new Error('Invalid token');
+        //   }
+        // },
+      }),
     }),
+    // GraphQLModule.forRoot<ApolloDriverConfig>({
+    //   driver: ApolloDriver,
+    //   playground: false,
+    //   autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    //   plugins: [ApolloServerPluginLandingPageLocalDefault()],
+    // }),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
