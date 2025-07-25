@@ -27,10 +27,11 @@ export class ItemsResolver {
   }
 
   @Query(() => Item, { name: 'item' })
-  findOne(
+  findOneByUser(
     @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
+    @CurrentUser() user: User,
   ): Promise<Item> {
-    return this.itemsService.findOne(id);
+    return this.itemsService.findOne(id, user);
   }
 
   @Mutation(() => Item)
@@ -41,7 +42,10 @@ export class ItemsResolver {
   }
 
   @Mutation(() => Boolean)
-  removeItem(@Args('id', { type: () => ID }) id: string): Promise<boolean> {
-    return this.itemsService.remove(id);
+  removeItem(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: User,
+  ): Promise<boolean> {
+    return this.itemsService.remove(id, user);
   }
 }

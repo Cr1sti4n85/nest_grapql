@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateItemInput } from './dto/inputs/create-item.input';
 import { UpdateItemInput } from './dto/inputs/update-item.input';
 import { Repository } from 'typeorm';
@@ -33,11 +37,17 @@ export class ItemsService {
     return items;
   }
 
-  async findOne(id: string): Promise<Item> {
-    const item = await this.itemsRepository.findOneBy({ id });
+  async findOne(id: string, user: User): Promise<Item> {
+    const item = await this.itemsRepository.findOneBy({
+      id,
+      user: {
+        id: user.id,
+      },
+    });
     if (!item) {
-      throw new BadRequestException(`Item with id ${id} not found`);
+      throw new ForbiddenException(`Operation not permited.`);
     }
+
     return item;
   }
 
@@ -51,8 +61,8 @@ export class ItemsService {
     return this.itemsRepository.save(item);
   }
 
-  async remove(id: string): Promise<boolean> {
-    const item = await this.findOne(id);
+  async remove(id: string, user: User): Promise<boolean> {
+    const item = await this.findOne(id, user);
 
     const deletedItem = await this.itemsRepository.remove(item);
     if (deletedItem) return true;
