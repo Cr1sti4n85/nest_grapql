@@ -73,4 +73,14 @@ export class ItemsService {
     if (deletedItem) return true;
     return false;
   }
+
+  async itemCountByUser(user: User): Promise<number> {
+    return await this.itemsRepository.count({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
+  }
 }
