@@ -17,6 +17,7 @@ type Item {
   """uuid of the item"""
   id: ID!
   name: String!
+  category: String!
   quantityUnits: String
   user: User!
 }
@@ -48,6 +49,7 @@ type Mutation {
   createItem(createItemInput: CreateItemInput!): Item!
   updateItem(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: ID!): Boolean!
+  poblarBD: Boolean!
 }
 
 input SignupInput {
@@ -73,10 +75,12 @@ input UpdateUserInput {
 input CreateItemInput {
   name: String!
   quantityUnits: String
+  category: String!
 }
 
 input UpdateItemInput {
   name: String
   quantityUnits: String
+  category: String
   id: ID!
 }

@@ -39,6 +39,7 @@ export class User {
   @ManyToOne(() => User, (user) => user.lastUpdatedBy, {
     nullable: true,
     lazy: true,
+    onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'lastUpdatedBy' })
   @Field(() => User, { nullable: true })

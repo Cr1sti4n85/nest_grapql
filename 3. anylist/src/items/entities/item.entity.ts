@@ -16,16 +16,15 @@ export class Item {
   id: string;
 
   @Field(() => String)
-  @Column({ unique: true })
   name: string;
 
-  // @Field(() => Float)
-  // @Column()
-  // quantity: number;
+  @Field(() => String)
+  @Column()
+  category: string;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  quantityUnits: string;
+  quantityUnits?: string;
 
   @ManyToOne(() => User, (user) => user.items, { nullable: false, lazy: true })
   @Index('userId-index')

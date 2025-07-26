@@ -9,7 +9,11 @@ export class CreateItemInput {
   name: string;
 
   @IsOptional()
-  @IsString()
   @Field(() => String, { nullable: true })
   quantityUnits?: string;
+
+  @Field(() => String)
+  @IsString()
+  @IsNotEmpty()
+  category: string;
 }
