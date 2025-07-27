@@ -16,6 +16,7 @@ export class Item {
   id: string;
 
   @Field(() => String)
+  @Column()
   name: string;
 
   @Field(() => String)
