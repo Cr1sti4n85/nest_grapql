@@ -16,7 +16,7 @@ export class List {
   id: string;
 
   @Field(() => String)
-  @Column(() => String)
+  @Column()
   name: string;
 
   @ManyToOne(() => User, (user) => user.lists, { nullable: false })

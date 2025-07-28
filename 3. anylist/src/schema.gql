@@ -2,6 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type List {
+  id: ID!
+  name: String!
+  user: User!
+}
+
 type User {
   id: ID!
   fullName: String!
@@ -11,6 +17,8 @@ type User {
   lastUpdatedBy: User
   itemCount: Int!
   items(limit: Int = 10, offset: Int = 0, search: String): [Item!]!
+  lists(limit: Int = 10, offset: Int = 0, search: String): [List!]!
+  listCount: Int!
 }
 
 type Item {
@@ -33,6 +41,8 @@ type Query {
   user(id: ID!): User!
   items(limit: Int = 10, offset: Int = 0, search: String): [Item!]!
   item(id: ID!): Item!
+  lists(limit: Int = 10, offset: Int = 0, search: String): [List!]!
+  list(id: ID!): List!
 }
 
 enum ValidRoles {
@@ -49,6 +59,9 @@ type Mutation {
   createItem(createItemInput: CreateItemInput!): Item!
   updateItem(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: ID!): Boolean!
+  createList(createListInput: CreateListInput!): List!
+  updateList(updateListInput: UpdateListInput!): List!
+  removeList(id: ID!): List!
   poblarBD: Boolean!
 }
 
@@ -82,5 +95,14 @@ input UpdateItemInput {
   name: String
   quantityUnits: String
   category: String
+  id: ID!
+}
+
+input CreateListInput {
+  name: String!
+}
+
+input UpdateListInput {
+  name: String
   id: ID!
 }
