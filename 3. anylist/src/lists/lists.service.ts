@@ -82,4 +82,14 @@ export class ListsService {
     if (deletedList) return true;
     return false;
   }
+
+  async listCountByUser(user: User): Promise<number> {
+    return await this.listRepository.count({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
+  }
 }
