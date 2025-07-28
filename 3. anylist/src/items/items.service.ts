@@ -53,6 +53,10 @@ export class ItemsService {
       .take(limit)
       .skip(offset);
 
+    if (search) {
+      queryBuilder.andWhere('name LIKE :search', { search: `%${search}%` });
+    }
+
     return queryBuilder.getMany();
   }
 
