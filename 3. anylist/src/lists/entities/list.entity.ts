@@ -19,7 +19,7 @@ export class List {
   @Column()
   name: string;
 
-  @ManyToOne(() => User, (user) => user.lists, { nullable: false })
+  @ManyToOne(() => User, (user) => user.lists, { nullable: false, lazy: true })
   @Field(() => User)
   @Index('idx_list_user_id')
   user: User;
