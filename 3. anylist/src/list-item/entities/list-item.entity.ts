@@ -4,13 +4,14 @@ import { Item } from '../../items/entities/item.entity';
 import {
   Column,
   Entity,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 @ObjectType()
-@Entity('listItems')
+@Unique('listItem-item', ['list', 'item'])
+@Entity({ name: 'list_items' })
 export class ListItem {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)

@@ -52,7 +52,7 @@ type Query {
   item(id: ID!): Item!
   lists(limit: Int = 10, offset: Int = 0, search: String): [List!]!
   list(id: ID!): List!
-  listItem(id: Int!): ListItem!
+  listItem: [ListItem!]!
 }
 
 enum ValidRoles {
@@ -74,8 +74,6 @@ type Mutation {
   removeList(id: ID!): List!
   poblarBD: Boolean!
   createListItem(createListItemInput: CreateListItemInput!): ListItem!
-  updateListItem(updateListItemInput: UpdateListItemInput!): ListItem!
-  removeListItem(id: Int!): ListItem!
 }
 
 input SignupInput {
@@ -121,12 +119,8 @@ input UpdateListInput {
 }
 
 input CreateListItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateListItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  quantity: Float = 0
+  completed: Boolean = false
+  listId: ID!
+  itemId: ID!
 }
