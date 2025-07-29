@@ -26,7 +26,7 @@ export class List {
   @Index('idx_list_user_id')
   user: User;
 
-  @OneToMany(() => ListItem, (ListItem) => ListItem.list)
-  @Field(() => [ListItem])
+  @OneToMany(() => ListItem, (ListItem) => ListItem.list, { lazy: true })
+  // @Field(() => [ListItem])
   listItems: ListItem;
 }
