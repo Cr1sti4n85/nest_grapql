@@ -4,11 +4,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from '../items/entities/item.entity';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { SEED_ITEMS, SEED_USERS } from './data/seed-data';
+import { SEED_ITEMS, SEED_LISTS, SEED_USERS } from './data/seed-data';
 import { UsersService } from '../users/users.service';
-import { ItemsService } from 'src/items/items.service';
-import { ListItem } from 'src/list-item/entities/list-item.entity';
-import { List } from 'src/lists/entities/list.entity';
+import { ItemsService } from '../items/items.service';
+import { ListItem } from '../list-item/entities/list-item.entity';
+import { List } from '../lists/entities/list.entity';
+import { ListsService } from '../lists/lists.service';
+import { ListItemService } from '../list-item/list-item.service';
 
 @Injectable()
 export class SeedService {
@@ -17,6 +19,8 @@ export class SeedService {
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
     private readonly itemsService: ItemsService,
+    private readonly listsService: ListsService,
+    private readonly listItemsService: ListItemService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Item) private readonly itemRepository: Repository<Item>,
     @InjectRepository(ListItem)
@@ -41,6 +45,17 @@ export class SeedService {
 
     // crear items
     await this.loadItems(user);
+
+    // crear listas
+    const list = await this.loadLists(user);
+
+    // crear listItems
+    const items = await this.itemsService.findAll(
+      user,
+      { limit: 15, offset: 0 },
+      {},
+    );
+    await this.loadListItems(list, items);
 
     console.log('Database seeded successfully');
     return true;
@@ -68,5 +83,25 @@ export class SeedService {
       items.push(this.itemsService.create(item, user));
     }
     await Promise.all(items);
+  }
+
+  async loadLists(user: User): Promise<List> {
+    const lists: Promise<List>[] = [];
+    for (const list of SEED_LISTS) {
+      lists.push(this.listsService.create(list, user));
+    }
+    await Promise.all(lists);
+    return lists[0];
+  }
+
+  async loadListItems(list: List, items: Item[]) {
+    for (const item of items) {
+      this.listItemsService.create({
+        itemId: item.id,
+        listId: list.id,
+        quantity: Math.round(Math.random() * 10) + 1,
+        completed: Math.random() > 0.5,
+      });
+    }
   }
 }
