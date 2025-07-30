@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateListItemInput } from './dto/create-list-item.input';
 import { UpdateListItemInput } from './dto/update-list-item.input';
 import { ListItem } from './entities/list-item.entity';
@@ -48,12 +48,39 @@ export class ListItemService {
     return await queryBuilder.getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} listItem`;
+  async findOne(id: string): Promise<ListItem> {
+    const foundListItem = await this.listItemRepository.findOneBy({ id });
+    if (!foundListItem) {
+      throw new NotFoundException(`List item with id ${id} not found`);
+    }
+    return foundListItem;
   }
 
-  update(id: number, updateListItemInput: UpdateListItemInput) {
-    return `This action updates a #${id} listItem`;
+  async update(
+    id: string,
+    updateListItemInput: UpdateListItemInput,
+  ): Promise<ListItem> {
+    const { listId, itemId, ...rest } = updateListItemInput;
+
+    const queryBuilder = this.listItemRepository
+      .createQueryBuilder()
+      .update()
+      .set(rest)
+      .where('id = :id', { id });
+
+    if (listId) {
+      queryBuilder.set({ list: { id: listId } });
+    }
+
+    if (itemId) {
+      queryBuilder.set({ item: { id: itemId } });
+    }
+    const result = await queryBuilder.execute();
+    if (result.affected === 0) {
+      throw new NotFoundException(`List item with id ${id} not found`);
+    }
+
+    return await this.findOne(id);
   }
 
   remove(id: number) {
