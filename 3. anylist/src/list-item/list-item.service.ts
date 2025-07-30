@@ -4,6 +4,10 @@ import { UpdateListItemInput } from './dto/update-list-item.input';
 import { ListItem } from './entities/list-item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { List } from '../lists/entities/list.entity';
+import { PaginationArgs } from '../common/dto/args/pagination.args';
+import { SearchArgs } from '../common/dto/args/search.args';
+import { take } from 'rxjs';
 
 @Injectable()
 export class ListItemService {
@@ -22,8 +26,26 @@ export class ListItemService {
     return await this.listItemRepository.save(newListItem);
   }
 
-  async findAll(): Promise<ListItem[]> {
-    return await this.listItemRepository.find();
+  async findAll(
+    list: List,
+    paginationArgs: PaginationArgs,
+    searchArgs: SearchArgs,
+  ): Promise<ListItem[]> {
+    const { limit, offset } = paginationArgs;
+    const { search } = searchArgs;
+    const queryBuilder = this.listItemRepository
+      .createQueryBuilder('list_items')
+      .innerJoin('list_items.item', 'item')
+      .take(limit)
+      .skip(offset)
+      .where('listId = :listId', { listId: list.id });
+
+    if (search) {
+      queryBuilder.andWhere('item.name ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+    return await queryBuilder.getMany();
   }
 
   findOne(id: number) {
