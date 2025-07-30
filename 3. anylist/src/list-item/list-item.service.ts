@@ -59,4 +59,10 @@ export class ListItemService {
   remove(id: number) {
     return `This action removes a #${id} listItem`;
   }
+
+  async countListItems(list: List): Promise<number> {
+    return await this.listItemRepository.count({
+      where: { list: { id: list.id } },
+    });
+  }
 }
