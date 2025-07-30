@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { SEED_ITEMS, SEED_USERS } from './data/seed-data';
 import { UsersService } from '../users/users.service';
 import { ItemsService } from 'src/items/items.service';
+import { ListItem } from 'src/list-item/entities/list-item.entity';
+import { List } from 'src/lists/entities/list.entity';
 
 @Injectable()
 export class SeedService {
@@ -17,6 +19,9 @@ export class SeedService {
     private readonly itemsService: ItemsService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Item) private readonly itemRepository: Repository<Item>,
+    @InjectRepository(ListItem)
+    private readonly listItemsRepository: Repository<ListItem>,
+    @InjectRepository(List) private readonly listRepository: Repository<List>,
   ) {
     this.isProd = this.configService.get<string>('STATE') === 'prod';
   }
@@ -42,6 +47,8 @@ export class SeedService {
   }
 
   private async deleteDatabase(): Promise<void> {
+    await this.listItemsRepository.query('DELETE FROM list_items');
+    await this.listRepository.query('DELETE FROM lists');
     await this.itemRepository.query('DELETE FROM items');
     await this.userRepository.query('DELETE FROM users');
     console.log('Database cleared');
